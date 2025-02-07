@@ -1,19 +1,24 @@
 const urlBase = "https://jsonplaceholder.typicode.com/posts";
-let posts = []; // iniciamos posteos array vacio
+let posts = []; // Iniciamos el array de posteos vacío
+let postsLoaded = false; // Variable de control para saber si ya cargamos los posteos
 
 function getData() {
-  fetch(urlBase)
-    .then((res) => res.json())
-    .then((data) => {
-      posts = data;
-      renderPostList()
-    })
-    .catch((error) => console.error("Error al llamar a la API: ", error));
+  if (!postsLoaded) {
+    fetch(urlBase)
+      .then((res) => res.json())
+      .then((data) => {
+        const localPosts = JSON.parse(localStorage.getItem("posts")) || [];
+        posts = [...data, ...localPosts]; // Solo traemos 10 de la API
+        renderPostList();
+        postsLoaded = true; // Marcar que ya se han cargado los posteos
+      })
+      .catch((error) => console.error("Error al llamar a la API: ", error));
+  }
 }
 
 function renderPostList() {
   const postList = document.getElementById("postList");
-  postList.innerHTML = "";
+  postList.innerHTML = ""; // Limpiar los posteos anteriores
 
   posts.forEach((post) => {
     const listItem = document.createElement("li");
@@ -38,6 +43,56 @@ function renderPostList() {
         </div>
     `;
     postList.appendChild(listItem);
-});
+})
+}
 
+//Funcion de boton para mostrar los posteos y ocultar
+function togglePosts() {
+  const postList = document.getElementById("postList");
+  const toggleButton = document.getElementById("toggleButton");
+
+  // Alternar la visibilidad de los posteos
+  if (postList.style.display === "none") {
+    postList.style.display = "block";
+    toggleButton.textContent = "Ocultar Posteos";
+  } else {
+    postList.style.display = "none";
+    toggleButton.textContent = "Mostrar Posteos";
+  }
+}
+
+
+function postData() {
+  const postForm = document.getElementById("postForm");
+  const postTitle = document.getElementById("title").value.trim();
+  const postBody = document.getElementById("postBody").value.trim();
+
+  if (postTitle === "" || postBody === "") {
+    alert("Los campos son obligatorios");
+    return;
+  }
+
+  fetch(urlBase, {
+    method: "POST",
+    body: JSON.stringify({
+      title: postTitle,
+      body: postBody,
+      userId: 1,
+    }),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      posts.push(data);
+      localStorage.setItem("posts", JSON.stringify(posts));
+      renderPostList();
+
+      // Limpiar el formulario completo
+      postForm.reset();
+
+      console.log("Post agregado y formulario limpiado");
+    })
+    .catch((error) => console.error("Error al querer agregar posteo", error));
 }
