@@ -8,15 +8,14 @@
     <link rel="stylesheet" href="style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 
 <body>
     <h1>Red Social Pajario</h1>
-    <h2>Ver Posteos</h2>
-    <button onclick="getData(); togglePosts()" id="toggleButton">Mostrar Posteos</button>
-    <ul id="postList" style="display: none;"></ul> <!-- Post List hidden initially -->
     <h2>¿Qué estás pensando?</h2>
     <form id="postForm" onsubmit="event.preventDefault(); postData()">
         <label for="title">Título</label>
@@ -25,6 +24,9 @@
         <textarea type="text" id="postBody" required></textarea>
         <button type="submit">Enviar</button>
     </form>
+    <h2>Ver Posteos</h2>
+    <button onclick="getData(); togglePosts()" id="toggleButton">Mostrar Posteos</button>
+    <ul id="postList" style="display: none;"></ul> <!-- Post List hidden initially -->
 
     <script src="script.js"></script>
 </body>
