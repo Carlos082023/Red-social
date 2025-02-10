@@ -24,7 +24,7 @@ Este es un proyecto de una red social simple llamada **Tweetify**, donde los usu
    ```
 2. **Navega al directorio del proyecto:**
    ```bash
-   cd red-social-pajario
+   cd red-social
    ```
 3. **Abre el archivo `index.html` en tu navegador:**
    - Doble clic en `index.html`, o
