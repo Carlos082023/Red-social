@@ -3,19 +3,15 @@ let posts = []; // Iniciamos el array de posteos vacío
 let postsLoaded = false; // Variable de control para saber si ya cargamos los posteos
 
 function getData() {
-    const localPosts = JSON.parse(localStorage.getItem("posts")) || [];
   if (!postsLoaded) {
     fetch(urlBase)
       .then((res) => res.json())
       .then((data) => {
-        posts = [...data, ...localPosts]; 
+        posts = data
         renderPostList()
         postsLoaded = true; // Marcar que ya se han cargado los posteos
       })
       .catch((error) => console.error("Error al llamar a la API: ", error));
-  }else {
-    posts = [...localPosts]; // Si ya cargó la API, usar solo LocalStorage
-    renderPostList();
   }
 }
 
