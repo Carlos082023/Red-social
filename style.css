@@ -1,102 +1,347 @@
-/* Estilos generales */
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f0f2f5;
-    color: #333;
-    margin: 0;
-    padding: 20px;
-    text-align: center;
+:root {
+    --primary: #1da1f2;
+    --primary-dark: #1a91da;
+    --secondary: #14171a;
+    --dark-gray: #657786;
+    --light-gray: #aab8c2;
+    --extra-light-gray: #e1e8ed;
+    --background: #f5f8fa;
+    --white: #ffffff;
+    --error: #e0245e;
+    --success: #17bf63;
 }
 
-/* Títulos */
-h1 {
-    color: #0077cc;
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background);
+    color: var(--secondary);
+    line-height: 1.5;
+    padding: 0;
+    margin: 0;
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background-color: var(--white);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 15px 0;
+    margin-bottom: 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-content {
+    max-width: 600px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--primary);
+    text-decoration: none;
+}
+
+.logo i {
     font-size: 28px;
+}
+
+.logo h1 {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.user-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.user-actions button {
+    background: none;
+    border: none;
+    color: var(--dark-gray);
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.user-actions button:hover {
+    color: var(--primary);
+}
+
+.create-post {
+    background-color: var(--white);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.create-post h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: var(--secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.create-post h2 i {
+    color: var(--primary);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid var(--extra-light-gray);
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 15px;
+    resize: none;
+    transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.posts-container {
+    margin-top: 30px;
+}
+
+.posts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.posts-header h2 {
+    font-size: 18px;
+    color: var(--secondary);
+}
+
+.toggle-btn {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+    background-color: var(--primary-dark);
+}
+
+.post-list {
+    list-style: none;
+}
+
+.post-item {
+    background-color: var(--white);
+    border-radius: 16px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.post-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 10px;
 }
 
-h2 {
-    color: #444;
-    font-size: 22px;
-    margin-top: 20px;
+.post-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--secondary);
+    margin-right: 10px;
 }
 
-/* Botones */
-button {
-    background: #0077cc;
+.post-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.post-actions button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--dark-gray);
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.post-actions .edit-btn:hover {
+    color: var(--primary);
+}
+
+.post-actions .delete-btn:hover {
+    color: var(--error);
+}
+
+.post-body {
+    color: var(--secondary);
+    margin-bottom: 15px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.edit-form {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid var(--extra-light-gray);
+}
+
+.edit-form input,
+.edit-form textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--extra-light-gray);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    resize: none;
+}
+
+.edit-form input:focus,
+.edit-form textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+}
+
+.update-btn {
+    background-color: var(--success);
     color: white;
     border: none;
-    padding: 12px 18px;
-    font-size: 16px;
+    border-radius: 15px;
+    padding: 8px 15px;
+    font-size: 13px;
+    font-weight: 500;
     cursor: pointer;
-    border-radius: 5px;
-    transition: background 0.3s;
-    margin-top: 10px;
-}
-
-button:hover {
-    background: #005fa3;
-}
-
-/* Formulario */
-form {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 10px;
-    max-width: 400px;
-    margin: 0 auto;
+    gap: 5px;
+    transition: background-color 0.2s;
 }
 
-label {
-    text-align: left;
-    font-weight: bold;
+.update-btn:hover {
+    background-color: #14a955;
 }
 
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin: 30px 0;
 }
 
-/* Lista de posteos */
-ul {
-    list-style: none;
-    padding: 0;
-    max-width: 700px;
-    margin: 20px auto;
+.pagination button {
+    background-color: var(--white);
+    color: var(--primary);
+    border: 1px solid var(--extra-light-gray);
+    border-radius: 20px;
+    padding: 8px 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-li {
-    background: rgb(213, 211, 211);
-    padding: 15px;
-    margin: 20px 0;
-    border-radius: 8px;
-    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+.pagination button:hover:not(:disabled) {
+    background-color: var(--primary);
+    color: var(--white);
 }
 
-/* Responsive */
+.pagination button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.pagination span {
+    color: var(--dark-gray);
+    font-size: 14px;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 30px;
+    color: var(--dark-gray);
+}
+
+.empty-state i {
+    font-size: 40px;
+    margin-bottom: 15px;
+    color: var(--light-gray);
+}
+
 @media (max-width: 480px) {
-    body {
+    .container {
         padding: 10px;
     }
 
-    h1 {
-        font-size: 24px;
+    .header-content {
+        padding: 0 10px;
     }
 
-    h2 {
+    .logo h1 {
         font-size: 18px;
     }
 
-    button {
-        font-size: 14px;
-        padding: 10px 14px;
-    }
-
-    input, textarea {
-        font-size: 14px;
+    .create-post,
+    .post-item {
+        border-radius: 12px;
     }
 }

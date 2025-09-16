@@ -1,204 +1,196 @@
 const urlBase = "https://jsonplaceholder.typicode.com/posts";
-let posts = []; // Iniciamos el array de posteos vacío
-let postsLoaded = false; // Variable de control para saber si ya cargamos los posteos
+let posts = [];
+let currentPage = 1;
+const postsPerPage = 10;
 
+// --- Traer datos de API y combinar con locales ---
 function getData() {
-  if (!postsLoaded) {
-    fetch(urlBase)
-      .then((res) => res.json())
-      .then((data) => {
-        posts = data
-        renderPostList()
-        postsLoaded = true; // Marcar que ya se han cargado los posteos
-      })
-      .catch((error) => console.error("Error al llamar a la API: ", error));
-  }
+  const localPosts = JSON.parse(localStorage.getItem("posts")) || [];
+  fetch(urlBase)
+    .then((res) => res.json())
+    .then((apiPosts) => {
+      posts = [...localPosts, ...apiPosts];
+      currentPage = 1;
+      renderPostList();
+      renderPagination();
+      toggleEmptyState();
+    })
+    .catch((error) => console.error("Error al llamar a la API: ", error));
 }
 
+// --- Renderizar posts según página ---
 function renderPostList() {
   const postList = document.getElementById("postList");
-  postList.innerHTML = ""; // Limpiar los posteos anteriores
+  postList.innerHTML = "";
 
-  posts.forEach((post) => {
+  const start = (currentPage - 1) * postsPerPage;
+  const end = start + postsPerPage;
+  const pagePosts = posts.slice(start, end);
+
+  pagePosts.forEach((post) => {
     const listItem = document.createElement("li");
     listItem.classList.add("postItem");
     listItem.innerHTML = `
-        <strong>${post.title}</strong>
-        <p>${post.body}</p>
-        <button onclick="editPost(${post.id})">
-            <i class="fa-solid fa-pen"></i> Editar
-        </button>
-        <button onclick="deletePost(${post.id})">
-            <i class="fa-solid fa-trash"></i> Eliminar
-        </button>
-        <div id="editForm${post.id}" class="editForm" style="display:none">
-            <label for="editTitle">Título: </label>
+          <div class="post-header">
+            <div class="post-title">${post.title}</div>
+            <div class="post-actions">
+              <button onclick="editPost(${post.id})" class="edit-btn"><i class="fa-solid fa-pen"></i></button>
+              <button onclick="deletePost(${post.id})" class="delete-btn"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </div>
+          <div class="post-body">${post.body}</div>
+          <div id="editForm${post.id}" class="editForm" style="display:none">
             <input type="text" id="editTitle-${post.id}" value="${post.title}" required>
-            <label for="editBody">Comentario: </label>
-            <textarea id="editBody-${post.id}" required>${post.body}</textarea>
-            <button onclick="updatePost(${post.id})">
-                <i class="fa-solid fa-check"></i> Actualizar
-            </button>
-        </div>
-    `;
+            <textarea id="editBody-${post.id}" rows="3" required>${post.body}</textarea>
+            <button onclick="updatePost(${post.id})" class="update-btn"><i class="fa-solid fa-check"></i> Actualizar</button>
+          </div>
+        `;
     postList.appendChild(listItem);
-})
+  });
+
+  toggleEmptyState();
 }
 
-//Funcion de boton para mostrar los posteos y ocultar
+// --- Renderizar botones de paginación ---
+function renderPagination() {
+  const pagination = document.getElementById("pagination");
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+
+  if (totalPages > 1) {
+    pagination.innerHTML = `
+          <button ${
+            currentPage === 1 ? "disabled" : ""
+          } onclick="changePage(currentPage - 1)">
+            <i class="fas fa-chevron-left"></i> Anterior
+          </button>
+          <span>Página ${currentPage} de ${totalPages}</span>
+          <button ${
+            currentPage === totalPages ? "disabled" : ""
+          } onclick="changePage(currentPage + 1)">
+            Siguiente <i class="fas fa-chevron-right"></i>
+          </button>
+        `;
+    pagination.style.display = "flex";
+  } else {
+    pagination.style.display = "none";
+  }
+}
+
+// --- Cambiar página ---
+function changePage(page) {
+  const totalPages = Math.ceil(posts.length / postsPerPage);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPostList();
+  renderPagination();
+}
+
+// --- Mostrar/ocultar posts ---
 function togglePosts() {
   const postList = document.getElementById("postList");
+  const pagination = document.getElementById("pagination");
   const toggleButton = document.getElementById("toggleButton");
+  const emptyState = document.getElementById("emptyState");
 
-  // Alternar la visibilidad de los posteos
   const isHidden = postList.style.display === "none";
   postList.style.display = isHidden ? "block" : "none";
-  toggleButton.textContent = isHidden ? "Ocultar Posteos" : "Mostrar Posteos";
+  pagination.style.display = isHidden && posts.length > 0 ? "flex" : "none";
+  toggleButton.innerHTML = isHidden
+    ? '<i class="fas fa-eye-slash"></i> Ocultar Posteos'
+    : '<i class="fas fa-eye"></i> Mostrar Posteos';
+
+  toggleEmptyState();
 }
 
-//sin llamar a la Api para poder actualizar nuestros posteos propios generando un Id unico
-function postData() {
-    const postForm = document.getElementById("postForm");
-    const postTitle = document.getElementById("title").value.trim();
-    const postBody = document.getElementById("postBody").value.trim();
-  
-    if (postTitle === "" || postBody === "") {
-      alert("Los campos son obligatorios");
-      return;
-    }
-  
-    // Obtener los posteos locales
-    const localPosts = JSON.parse(localStorage.getItem("posts")) || [];
-  
-    // Asignar un ID único manualmente
-    const newId = localPosts.length > 0 ? Math.max(...localPosts.map(p => p.id)) + 1 : 101;
-    
-    const newPost = {
-      id: newId,
-      title: postTitle,
-      body: postBody,
-      userId: 1,
-    };
-  
-    // Agregar el nuevo post al array de posteos
-    localPosts.unshift(newPost);
-    posts.unshift(newPost);
-  
-    // Guardar en localStorage
-    localStorage.setItem("posts", JSON.stringify(localPosts));
-  
-    // Renderizar nuevamente la lista de posteos
-    renderPostList();
-    
-    // Limpiar el formulario
-    postForm.reset();
+// --- Mostrar/ocultar estado vacío ---
+function toggleEmptyState() {
+  const postList = document.getElementById("postList");
+  const emptyState = document.getElementById("emptyState");
+
+  if (postList.style.display !== "none" && posts.length === 0) {
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
   }
-  
-  
-
-// function postData() {
-//   const postForm = document.getElementById("postForm");
-//   const postTitle = document.getElementById("title").value.trim();
-//   const postBody = document.getElementById("postBody").value.trim();
-
-//   if (postTitle === "" || postBody === "") {
-//     alert("Los campos son obligatorios");
-//     return;
-//   }
-
-//   fetch(urlBase, {
-//     method: "POST",
-//     body: JSON.stringify({
-//       title: postTitle,
-//       body: postBody,
-//       userId: 1,
-//     }),
-//     headers: {
-//       "Content-type": "application/json; charset=UTF-8",
-//     },
-//   })
-//     .then((res) => res.json())
-//     .then((data) => {
-//       posts.unshift(data);
-//       localStorage.setItem("posts", JSON.stringify(posts));
-//       renderPostList();
-
-//       // Limpiar el formulario completo
-//       postForm.reset();
-
-//       console.log("Post agregado y formulario limpiado");
-//     })
-//     .catch((error) => console.error("Error al querer agregar posteo", error));
-// }
-
-function editPost(id){
-    const editForm = document.getElementById(`editForm${id}`)
-    editForm.style.display = (editForm.style.display == 'none') ? 'block' : 'none'
 }
 
-// function updatePost(id) {
-//     const editTitle = document.getElementById(`editTitle-${id}`).value;
-//     const editBody = document.getElementById(`editBody-${id}`).value;
+// --- Agregar nuevo post local ---
+function postData() {
+  const postTitle = document.getElementById("title").value.trim();
+  const postBody = document.getElementById("postBody").value.trim();
+  if (!postTitle || !postBody) {
+    alert("Los campos son obligatorios");
+    return;
+  }
 
-//     fetch(`${urlBase}/${id}`, {
-//         method: 'PUT',
-//         body: JSON.stringify({
-//             id: id,
-//             title: editTitle,
-//             body: editBody,
-//             userId: 1,
-//         }),
-//         headers: {
-//             'Content-type': 'application/json; charset=UTF-8',
-//         },
-//     })
-//         .then(res => res.json())
-//         .then(data => {
-//             const index = posts.findIndex(post => post.id === data.id)
-//             if (index != -1) {
-//                 posts[index] = data
-//             } else {
-//                 alert('Hubo un error al actualizar la información del posteo')
-//             }
-//             renderPostList()
-//         })
-//         .catch(error => console.error('Error al querer actualizar posteo: ', error))
-// }
+  const localPosts = JSON.parse(localStorage.getItem("posts")) || [];
+  const newId =
+    localPosts.length > 0
+      ? Math.max(...localPosts.map((p) => p.id)) + 1000
+      : 1001;
+  const newPost = { id: newId, title: postTitle, body: postBody };
 
+  localPosts.unshift(newPost);
+  localStorage.setItem("posts", JSON.stringify(localPosts));
+  posts.unshift(newPost);
 
-// otro metodo para actualizar nuestros posteos locales ya que no tengo un backend
+  currentPage = 1;
+  renderPostList();
+  renderPagination();
+  document.getElementById("postForm").reset();
+
+  // Mostrar los posts si estaban ocultos
+  const postList = document.getElementById("postList");
+  if (postList.style.display === "none") {
+    togglePosts();
+  }
+}
+
+// --- Editar post local ---
+function editPost(id) {
+  const editForm = document.getElementById(`editForm${id}`);
+  editForm.style.display = editForm.style.display === "none" ? "block" : "none";
+}
+
+// --- Actualizar post local ---
 function updatePost(id) {
-    const editTitle = document.getElementById(`editTitle-${id}`).value;
-    const editBody = document.getElementById(`editBody-${id}`).value;
+  const editTitle = document.getElementById(`editTitle-${id}`).value.trim();
+  const editBody = document.getElementById(`editBody-${id}`).value.trim();
 
-    // Buscar el post en el array local
-    const index = posts.findIndex(post => post.id === id);
+  let localPosts = JSON.parse(localStorage.getItem("posts")) || [];
+  const index = localPosts.findIndex((p) => p.id === id);
 
-    if (index !== -1) {
-        posts[index].title = editTitle;
-        posts[index].body = editBody;
+  if (index !== -1) {
+    localPosts[index].title = editTitle;
+    localPosts[index].body = editBody;
+    localStorage.setItem("posts", JSON.stringify(localPosts));
 
-        // Guardar en localStorage
-        localStorage.setItem("posts", JSON.stringify(posts));
-
-        renderPostList();
-    } else {
-        alert('Hubo un error al actualizar el posteo.');
+    const globalIndex = posts.findIndex((p) => p.id === id);
+    if (globalIndex !== -1) {
+      posts[globalIndex].title = editTitle;
+      posts[globalIndex].body = editBody;
     }
+
+    renderPostList();
+  } else {
+    alert("Solo se pueden editar los posts locales");
+  }
 }
 
-
+// --- Eliminar post ---
 function deletePost(id) {
-    fetch(`${urlBase}/${id}`, {
-        method: 'DELETE',
-    })
-    .then(res => {
-        if(res.ok){
-            posts = posts.filter(post => post.id != id)
-            renderPostList();
-        } else{
-            alert('Hubo un error y no se pudo eliminar el posteo')
-        }
-    })
-    .catch(error => console.error('Hubo un error: ', error))
+  if (!confirm("¿Estás seguro de que quieres eliminar este post?")) {
+    return;
+  }
+
+  if (id > 100) {
+    // post local
+    let localPosts = JSON.parse(localStorage.getItem("posts")) || [];
+    localPosts = localPosts.filter((p) => p.id !== id);
+    localStorage.setItem("posts", JSON.stringify(localPosts));
+  }
+  posts = posts.filter((p) => p.id !== id);
+  renderPostList();
+  renderPagination();
+  toggleEmptyState();
 }
